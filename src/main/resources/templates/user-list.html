@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body{
+            background:linear-gradient(90deg, deeppink 0%, deeppink 20%, aqua 20%, aqua 40%, yellow 40%, yellow 60%, chartreuse 60%, chartreuse 80%, blue 80%, blue 100%);
+            font-family: Arial;
+        }
+
+        a{
+            text-decoration: none;
+            padding: 10px 20px;
+            background:linear-gradient(90deg, red, blue);
+            color: white;
+            border-radius: 18px;
+            transition: 0.5s;
+        }
+        a:hover{
+            padding:11px 21px;
+        }
+        a:active{
+            transform: rotateY(360deg);
+        }
+
+        h2{
+            color: blue;
+            text-align: center;
+        }
+
+        tr{
+            height: 40px;
+        }
+        .container{
+            width: 80%;
+            margin: 0 auto;
+            padding-left: 130px;
+        }
+        input[id="searchInput"]{
+            padding: 10px 20px;
+            border: 1px double blue;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            background-color: purple;
+            outline: none;
+            color:  white;
+        }
+        input[id="searchInput"]::placeholder{
+            color: white;
+            font-size: 16px;
+        }
+        button{
+            padding: 10px 20px;
+            border: none;
+            font-size: 16px;
+            border-radius: 18px;
+            background:linear-gradient(90deg, red, blue);
+            outline: none;
+            color: white;
+            transition: 1s;
+            margin-left: 100px;
+        }
+        button:active{
+            transform: rotate(360deg);
+        }
+        .search-container{
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+    <title>Users</title>
+</head>
+<body>
+<div class="container" th:switch="${users}">
+    <h2 th:case="null">Haydovchi topilmadi!</h2>
+    <div th:case="*">
+        <h2>Haydovchilar ro'yhati</h2>
+        <div class="search-container">
+            <label for="searchInput" style="color: blue; font-size: 30px">Qidirish:</label>
+            <input type="text" id="searchInput" oninput="filterDrivers()" placeholder="🔎 Search...">
+            <button onclick="toggleExpiredDrivers()">⚡⚡⚡Muddati o'tgan haydovchilar ⚡⚡⚡</button>
+        </div>
+        <table border="1px" width="1100px">
+            <thead bg="green">
+            <tr>
+                <th>Id</th>
+                <th>Haydovchi ismi</th>
+                <th>Haydovchi familiyasi</th>
+                <th>Telefon nomeri</th>
+                <th>Litsenziya olish sanasi</th>
+                <th>Litsenziya tugashi</th>
+                <th>Litsenziya raqami</th>
+                <th>Tahrirlash</th>
+                <th>O'chirish</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}" >
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td th:text="${user.phoneNumber}"></td>
+                <td th:text="${user.regDate}"></td>
+                <td class="endDateCell" th:text="${user.endDate}"></td> <!-- Добавляем класс endDateCell -->
+                <td th:text="${user.lisenceNum}"></td>
+                <td><a th:href="@{user-update/{id}(id=${user.id})}">Edit🖊</a></td>
+                <td><a th:href="@{user-delete/{id}(id=${user.id})}">Delete🗑</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p><a href="/user-create">Haydovchi yaratish🚖</a></p>
+</div>
+<script>
+
+    var showExpired = false; // Переменная для отслеживания текущего состояния фильтрации
+
+    // Функция для фильтрации водителей по значению в поле поиска
+    function filterDrivers() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.querySelector("table");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td");
+            for (var j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                        break; // Показываем строку, если есть хотя бы одно совпадение
+                    } else {
+                        tr[i].style.display = "none"; // Скрываем строку, если нет совпадений
+                    }
+                }
+            }
+        }
+    }
+
+    // Функция для переключения между показом всех водителей и только просроченных лицензий
+    function toggleExpiredDrivers() {
+        var endDateCells = document.querySelectorAll('.endDateCell');
+        showExpired = !showExpired; // Инвертируем значение переменной
+        endDateCells.forEach(function (cell) {
+            var endDate = new Date(cell.innerText);
+            var currentDate = new Date();
+            if(endDate<currentDate){
+                cell.parentNode.style.color = "purple";
+            }
+            if (!showExpired || endDate < currentDate) {
+                cell.parentNode.style.display = ""; // Показываем строку, если срок истек или если showExpired=false
+            } else {
+                cell.parentNode.style.display = "none"; // Скрываем строку, если срок не истек и showExpired=true
+            }
+        });
+    }
+</script>
+</body>
+</html>

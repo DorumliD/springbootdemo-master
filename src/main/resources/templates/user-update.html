@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<meta charset="UTF-8">
+<title>Create driver</title>
+<style>
+    body{
+        background:linear-gradient(90deg, red 0%, red 20%, aqua 20%, aqua 40%, yellow 40%, yellow 60%, chartreuse 60%, chartreuse 80%, blue 80%, blue 100%);
+        font-family: Arial;
+    }
+
+    a{
+        text-decoration: none;
+        padding: 10px 20px;
+        background:linear-gradient(90deg, red, blue);
+        color: white;
+        border-radius: 15px;
+        transition: 1s;
+    }
+
+    a:hover{
+        transform: scale(1.3);
+        transition: 1s;
+    }
+    a:active{
+        transform: rotate(360deg);
+        transition: 1s;
+    }
+    h2{
+        color: blue;
+        text-align: center;
+    }
+    tr{
+        min-height: 40px;
+    }
+    input[type="text"], input[type="date"]{
+        background-color: darkmagenta;
+        color: white;
+    }
+    ::placeholder{
+        color: yellow;
+    }
+    input{
+        border-radius: 15px;
+        padding: 10px 15px;
+    }
+    input[type="submit"]{
+        background: linear-gradient(90deg, red, blue);
+        color: white;
+    }
+    label{
+        font-weight: bold;
+        margin-right: 100px;
+    }
+    form{
+        width: 80%;
+        margin: 0 auto;
+        padding-left: 150px
+    }
+
+</style>
+</head>
+<body>
+<form action="#" th:action="@{/user-update}" th:object="${user}" method="post" onsubmit="return validateForm()">
+    <h2>Haydovchi ma'lumotlarini o'zgartiring</h2>
+    <br>
+    <br>
+    <label for="id">ID</label>
+    <input readonly type="number" th:field="*{id}" id="id" placeholder="ID">
+    <br/>
+    <br/>
+    <label for="firstName">Haydovchi ismi</label>
+    <input type="text" th:field="*{firstName}" id="firstName" placeholder="First Name" required>
+    <br/>
+    <br/>
+    <label for="lastName">Haydovchi familiyasi</label>
+    <input type="text" th:field="*{lastName}" id="lastName" placeholder="Last Name" required>
+    <br/>
+    <br/>
+    <label for="phoneNumber">Telefon nomeri</label>
+    <input type="text" th:field="*{phoneNumber}" id="phoneNumber" placeholder="Phone number" oninput="formatPhoneNumber(this)" required>
+    <br/>
+    <br/>
+    <label for="regDate">Litsenziya olgan sanasi</label>
+    <input type="date" th:field="*{regDate}" id="regDate" placeholder="Date of register" onchange="validateDateFields()" min="2021-01-01" max="2099-12-31" required>
+    <br/>
+    <br/>
+    <label for="endDate">Litsenziya tugashi </label>
+    <input type="date" th:field="*{endDate}" id="endDate" placeholder="End of date" onchange="validateDateFields()" min="2021-01-01" max="2099-12-31" required>
+    <br/>
+    <br/>
+    <!-- вывожу абзац с предупреждением -->
+    <p id="dateWarning" style="display:none; color:purple;">Iltimos hamma sanalarni kiriting.</p>
+    <br><br>
+    <label for="lisenceNum">Litsenziya raqami</label>
+    <input type="text" th:field="*{lisenceNum}" id="lisenceNum" placeholder="Number of Lisence" required>
+    <br/>
+    <br/> <input type="submit" value="Tahrirni saqlash">
+</form>
+
+<script>
+    function formatPhoneNumber(input) {
+        // Удаляем все символы, кроме цифр
+        var phoneNumber = input.value.replace(/\D/g, '');
+
+        // Проверяем, что номер телефона содержит не менее 12 цифр
+        if (phoneNumber.length >= 12) {
+            // Форматируем номер, добавляя знак "+"
+            phoneNumber = '+' + phoneNumber.slice(0, 12);
+        }
+
+        // Обновляем значение в поле ввода
+        input.value = phoneNumber;
+    }
+
+    function validateDateFields() {
+        // Получаем значения полей даты
+        var regDate = document.getElementById("regDate").value;
+        // Проверяем, заполнены ли остальные поля
+        var firstName = document.getElementById("firstName").value;
+        var lastName = document.getElementById("lastName").value;
+        var phoneNumber = document.getElementById("phoneNumber").value;
+        var lisenceNum = document.getElementById("lisenceNum").value;
+
+        // Если хотя бы одно поле не заполнено, показываем предупреждение
+        if (firstName === "" || lastName === "" || phoneNumber === "" || lisenceNum === "") {
+            document.getElementById("dateWarning").style.display = "block";
+            return false; // Отменяем отправку формы
+        } else {
+            document.getElementById("dateWarning").style.display = "none";
+            return true; // Разрешаем отправку формы
+        }
+    }
+
+    function validateForm() {
+        // Перед отправкой формы вызываем функцию для валидации даты
+        return validateDateFields();
+    }
+</script>
+</body>
+</html>
